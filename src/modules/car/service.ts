@@ -1,4 +1,4 @@
-import { CreateCarDto } from "./interface";
+import { CreateCarDto,filterCarDto } from "./interface";
 import carRepository from "./repository";
 import { ConflictError } from "../../common/errors/ConflictError";
 import { NotFoundError } from "../../common/errors/NotFoundError";
@@ -15,9 +15,9 @@ class CarService {
     return carRepository.create(data);
   }
 
-  // async getAllCustomers() {
-  //   return customerRepository.findAll();
-  // }
+  async getAllCars(filter: filterCarDto) {
+    return carRepository.findAll(filter);
+  }
 
   // async getCustomerByPhone(phoneNumber: string) {
   //   return customerRepository.findByPhone(phoneNumber);

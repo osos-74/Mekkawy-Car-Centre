@@ -44,7 +44,15 @@ export const createCarSchema = z.object({
         .trim()
         .min(3, "Body number is required")
         .max(100, "Body number cannot exceed 100 characters"),
+
 });
+
+export const filterCarSchema = z.object({
+    make: z.string().optional(),
+    model: z.string().optional(),
+    year: z.coerce.number().optional(),
+    customerId: z.coerce.number().optional(),
+}).strict();
 
 export const updateCarSchema = createCarSchema
     .omit({

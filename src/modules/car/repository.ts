@@ -1,7 +1,8 @@
 import Car from "./model";
 import {
     CreateCarDto,
-    UpdateCarDto
+    UpdateCarDto,
+    filterCarDto
 } from "./interface";
 
 class CarRepository {
@@ -37,9 +38,9 @@ class CarRepository {
     //     });
     // }
 
-    // async findAll() {
-    //     return Customer.findAll();
-    // }
+    async findAll(filter: Partial<filterCarDto> ) {
+        return Car.findAll({ where: filter });
+    }
 
     async update(
         carId: number,

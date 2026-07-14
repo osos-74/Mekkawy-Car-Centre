@@ -1,60 +1,54 @@
-import Service from "./model";
+import Quotation from "./model";
 import {
-    CreateServiceDto,
-    UpdateServiceDto
+    CreateQuotationDto,
+    UpdateQuotationDto
 } from "./interface";
 
-class ServiceRepository {
+class QuotationRepository {
 
-    async create(data: CreateServiceDto) {
-        return Service.create(data);
+    async create(data: CreateQuotationDto) {
+        return Quotation.create(data);
     }
 
-    async findById(serviceId: number) {
-        return Service.findByPk(serviceId);
+    async findById(quotationId: number) {
+        return Quotation.findByPk(quotationId);
     }
 
 
     async findAll() {
-        return Service.findAll();
+        return Quotation.findAll();
     }
 
-    async findByName(name: string) {
-        return Service.findOne({
-            where: {name}
-        });
-    }
-
-
+  
     async update(
-        serviceId: number,
-        data: UpdateServiceDto
+        quotationId: number,
+        data: UpdateQuotationDto
     ) {
 
-        const service = await this.findById(serviceId);
+        const quotation = await this.findById(quotationId);
 
-        if (!service) {
+        if (!quotation) {
             return null;
         }
 
-        await service.update(data);
+        await quotation.update(data);
 
-        return service;
+        return quotation;
     }
 
-    async delete(serviceId: number) {
+    async delete(quotationId: number) {
 
-        const service = await this.findById(serviceId);
+        const quotation = await this.findById(quotationId);
 
-        if (!service) {
+        if (!quotation) {
             return false;
         }
 
-        await service.destroy();
+        await quotation.destroy();
 
         return true;
     }
 
 }
 
-export default new ServiceRepository();
+export default new QuotationRepository();

@@ -1,12 +1,14 @@
 const express = require('express');
 const cors = require("cors");
 const router = express.Router();
-import {validate} from "../../common/middleware/validate"
-import {createCarSchema} from "./validation";
+import validate from "../../common/middleware/validate"
+import {createCarSchema, filterCarSchema} from "./validation";
 
 import carController from"./controller"
-router.post("/", validate(createCarSchema),carController.create);
-router.put("/:id", validate(createCarSchema),carController.update);
+router.get("/", validate(filterCarSchema,"query"), carController.getCars);
+
+router.post("/", validate(createCarSchema,"body"),carController.create);
+router.put("/:id", validate(createCarSchema,"body"),carController.update);
 // router.delete("/:id",carController.delete);
 // router.get("/", carController.getCars);
 router.get('/:phone',carController.getCarByPhone)

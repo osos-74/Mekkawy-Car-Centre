@@ -1,24 +1,26 @@
-import { RequestHandler } from "express";
-import { ZodSchema } from "zod";
-import { BadRequestError } from "../errors/BadRequestError";
+import { Request, Response, NextFunction } from "express";
+import { ZodType } from "zod";
 
-export const validate =
-    (schema: ZodSchema): RequestHandler =>
-    (req, res, next) => {
+type ValidationTarget = "body" | "query" | "params";
 
-        const result = schema.safeParse(req.body);
+export default function validate(
+    schema: ZodType,
+    target: ValidationTarget = "body"
+) {
+    return (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ) => {
+
+        const result = schema.safeParse(req[target]);
 
         if (!result.success) {
-            return next(
-                new BadRequestError(
-                    result.error.issues
-                        .map(issue => issue.message)
-                        .join(", ")
-                )
-            );
+            return next(result.error);
         }
 
-        req.body = result.data;
+        Object.assign(req[target], result.data);
 
         next();
     };
+}

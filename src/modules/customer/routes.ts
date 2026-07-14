@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require("cors");
 const router = express.Router();
-import {validate} from "../../common/middleware/validate"
+import validate from "../../common/middleware/validate"
 import {createCustomerSchema} from "./validation";
 
 import customerController from"./controller"

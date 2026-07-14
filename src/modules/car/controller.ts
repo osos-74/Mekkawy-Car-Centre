@@ -13,19 +13,22 @@ class CarController {
 
     });
     
-//     getCars = asyncHandler(async (req: Request, res: Response) => {
+    getCars = asyncHandler(async (req: Request, res: Response) => {
 
-//         const cars = await carService.getAllCars();
-//         res.status(200).json({message : "Cars retrieved successfully", cars});
+        const cars = await carService.getAllCars(req.query);
+        if (!cars || cars.length === 0) {
+            return res.status(404).json({ message: "No cars found" });
+        }
+        res.status(200).json({message : "Cars retrieved successfully", cars});
 
-//     });
+    });
 
     getCarByPhone = asyncHandler(async (req: Request, res: Response) => {
 
         const car = await carService.getCarByPhone(String(req.params.phone));    
         res.status(200).json({message : "Car retrieved successfully", car});
     });
-    
+
     update = asyncHandler(async (req: Request, res: Response) => {
 
         const car = await carService.updateCar(Number(req.params.id), req.body); 

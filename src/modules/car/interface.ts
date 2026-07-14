@@ -32,3 +32,10 @@ export interface UpdateCarDto {
     engineNumber?: string;
     bodyNumber?: string;
 }
+
+export interface filterCarDto {
+    make?: string;
+    model?: string;
+    year?: number;
+    customerId?: number;
+}   
