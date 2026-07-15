@@ -1,47 +1,63 @@
 
 import { Request, Response } from "express";
 import { asyncHandler } from "../../common/middleware/asyncHandler";
-import serviceService from "./service";
+import quotationService from "./service";
 
-class ServiceController {
+class QuotationController {
 
     create = asyncHandler(async (req: Request, res: Response) => {
 
-        const service = await serviceService.createService(req.body);
+        const quotation = await quotationService.createQuotation(req.body);
 
-        res.status(201).json(service);
-
-    });
-
-    getServices = asyncHandler(async (req: Request, res: Response) => {
-
-        const services = await serviceService.getAllServices();
-        res.status(200).json({message : "Services retrieved successfully", services});
+        res.status(201).json(quotation);
 
     });
 
+    getQuotations = asyncHandler(async (req: Request, res: Response) => {
 
-    getServiceById = asyncHandler(async (req: Request, res: Response) => {
-
-        const service = await serviceService.getServiceById(Number(req.params.id));
-        res.status(200).json({message : "Service retrieved successfully", service});
-    });
-
-
-    update = asyncHandler(async (req: Request, res: Response) => {
-
-        const service = await serviceService.updateService(Number(req.params.id), req.body); 
-
-        res.status(200).json({message : "Service updated successfully", service});
+        const quotations = await quotationService.getAllQuotations(req.query);
+        if (!quotations || quotations.length === 0) {
+            return res.status(404).json({ message: "No quotations found" });
+        }
+        res.status(200).json({message : "Quotations retrieved successfully", quotations});
 
     });
 
-    deleteService = asyncHandler(async (req: Request, res: Response) => {
+    addLine = asyncHandler(async (req: Request, res: Response) => {
 
-        await serviceService.deleteService(Number(req.params.id));    
-        res.status(200).json({ message: "Service deleted successfully" });
+        const quotationLine = await quotationService.addLine(req.body);
+        if (!quotationLine) {
+            return res.status(404).json({ message: "failed to add line" });
+        }
+        res.status(201).json(quotationLine);
+    });
+    // getQuotationById = asyncHandler(async (req: Request, res: Response) => {
+
+    //     const quotation = await quotationService.getQuotationById(Number(req.params.id));
+    //     res.status(200).json({message : "Quotation retrieved successfully", quotation});
+    // });
+
+
+    // update = asyncHandler(async (req: Request, res: Response) => {
+
+    //     const quotation = await quotationService.updateQuotation(Number(req.params.id), req.body); 
+
+    //     res.status(200).json({message : "Quotation updated successfully", quotation});
+
+    // });
+
+    deleteQuotation = asyncHandler(async (req: Request, res: Response) => {
+
+        await quotationService.deleteQuotation(Number(req.params.id));    
+        res.status(200).json({ message: "Quotation deleted successfully" });
     });
 
+    deleteLine = asyncHandler(async (req: Request, res: Response) => {
+
+        await quotationService.deleteQuotationLine(Number(req.params.id));    
+        res.status(200).json({ message: "Quotation line deleted successfully" });
+        
+    })
 }
 
-export default new ServiceController();
+export default new QuotationController();

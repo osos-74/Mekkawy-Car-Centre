@@ -3,6 +3,7 @@ import {
     CreateServiceDto,
     UpdateServiceDto
 } from "./interface";
+import { Transaction } from "sequelize";
 
 class ServiceRepository {
 
@@ -10,18 +11,19 @@ class ServiceRepository {
         return Service.create(data);
     }
 
-    async findById(serviceId: number) {
-        return Service.findByPk(serviceId);
+    async findById(serviceId: number, transaction?: Transaction) {
+        return Service.findByPk(serviceId, { transaction });
     }
 
 
-    async findAll() {
-        return Service.findAll();
+    async findAll(transaction?: Transaction) {
+        return Service.findAll({ transaction });
     }
 
-    async findByName(name: string) {
+    async findByName(name: string, transaction?: Transaction) {
         return Service.findOne({
-            where: {name}
+            where: {name},
+            transaction
         });
     }
 
@@ -29,22 +31,23 @@ class ServiceRepository {
     async update(
         serviceId: number,
         data: UpdateServiceDto
+        , transaction?: Transaction
     ) {
 
-        const service = await this.findById(serviceId);
+        const service = await this.findById(serviceId, transaction);
 
         if (!service) {
             return null;
         }
 
-        await service.update(data);
+        await service.update(data, { transaction });
 
         return service;
     }
 
-    async delete(serviceId: number) {
+    async delete(serviceId: number, transaction?: Transaction) {
 
-        const service = await this.findById(serviceId);
+        const service = await this.findById(serviceId, transaction);
 
         if (!service) {
             return false;

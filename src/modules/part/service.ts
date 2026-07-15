@@ -14,8 +14,8 @@ class PartService {
     return partRepository.findAll();
   }
 
-  async getPartById(partId: number) {
-    return partRepository.findById(partId);
+  async getPartById(partId: number, transaction?: any) {
+    return partRepository.findById(partId, transaction);
   }
 
   async updatePart(id: number, data: Partial<UpdatePartDto>) {

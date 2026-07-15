@@ -13,6 +13,14 @@ class CustomerService {
     return customerRepository.create(data);
   }
 
+  async getCustomerById(id: number) {
+    const customer = await customerRepository.findById(id);
+    if (!customer) {
+      throw new NotFoundError("Customer not found");
+    }
+    return customer;
+  }
+
   async getAllCustomers() {
     return customerRepository.findAll();
   }

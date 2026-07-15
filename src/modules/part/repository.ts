@@ -3,41 +3,42 @@ import {
     CreatePartDto,
     UpdatePartDto
 } from "./interface";
-
+import { Transaction } from "sequelize";
 class PartRepository {
 
     async create(data: CreatePartDto) {
         return Part.create(data);
     }
 
-    async findById(partId: number) {
-        return Part.findByPk(partId);
+    async findById(partId: number, transaction?: Transaction) {
+        return Part.findByPk(partId, { transaction });
     }
 
 
-    async findAll() {
-        return Part.findAll();
+    async findAll(transaction?: Transaction) {
+        return Part.findAll({ transaction });
     }
 
     async update(
         partId: number,
-        data: UpdatePartDto
+        data: UpdatePartDto,
+        transaction?: Transaction
     ) {
 
-        const part = await this.findById(partId);
+        const part = await this.findById(partId, transaction);
 
         if (!part) {
             return null;
         }
 
-        await part.update(data);
+        await part.update(data, { transaction });
 
         return part;
     }
 
-    async delete(partId: number) {
+    async delete(partId: number, transaction?: Transaction) {
 
-        const part = await this.findById(partId);
+        const part = await this.findById(partId, transaction);
 
         if (!part) {
             return false;

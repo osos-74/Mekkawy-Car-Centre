@@ -95,7 +95,7 @@ Quotation.init(
     {
         sequelize,
         modelName: "Quotation",
-        tableName: "quotations",
+        tableName: "quotation",
         timestamps: true,
         underscored: true,
     }

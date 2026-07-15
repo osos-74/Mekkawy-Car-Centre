@@ -3,7 +3,8 @@ import carRepository from "./repository";
 import { ConflictError } from "../../common/errors/ConflictError";
 import { NotFoundError } from "../../common/errors/NotFoundError";
 import customerService from "../customer/service"
-
+import  { Transaction }  from "sequelize";
+import sequelize from "../../config/database";
 class CarService {
   async createCar(data: CreateCarDto) {
     const existing = await carRepository.findByEngineNumber(data.engineNumber);
@@ -24,14 +25,15 @@ class CarService {
   // }
 
 async updateCar(id: number, data: Partial<CreateCarDto>) {
+ 
     const existingCar = await carRepository.findById(id);
     if (!existingCar) {
       throw new NotFoundError("Car not found");
     }
-
-    return carRepository.update(id, data);
-  }
-
+    
+    return await carRepository.update(id, data);
+ 
+}
   // async deleteCustomer(id: number) {
   //   const existing = await customerRepository.findById(id);
   //   if (!existing) {
@@ -40,16 +42,17 @@ async updateCar(id: number, data: Partial<CreateCarDto>) {
   //   return customerRepository.delete(existing.customerId);
   // }
 
-  async getCarByPhone(phoneNumber: string) {
-    const customer = await customerService.getCustomerByPhone(phoneNumber);  
-      if (!customer) {
-        throw new NotFoundError("User Not Registered with this phone number");
-      }
-      const car = await carRepository.findByCustomerId(customer.customerId);
-      if (!car) {
-        throw new NotFoundError("No Car found for the provided phone number");
-      }
-      return car;
-}
+//   async getCarByPhone(phoneNumber: string) {
+//     const customer = await customerService.getCustomerByPhone(phoneNumber);  
+//       if (!customer) {
+//         throw new NotFoundError("User Not Registered with this phone number");
+//       }
+//       const car = await carRepository.findByCustomerId(customer.customerId);
+//       if (!car) {
+//         throw new NotFoundError("No Car found for the provided phone number");
+//       }
+//       return car;
+// }
+
 }
 export default new CarService();

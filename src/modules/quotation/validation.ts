@@ -39,3 +39,10 @@ export const updateQuotationSchema = z.object({
         .max(500)
         .optional(),
 });
+export const filterQuotationSchema = z.object({
+    customerId: z.coerce.number().optional(),
+    carId: z.coerce.number().optional(),
+    total: z.coerce.number().optional(),
+    discount: z.coerce.number().optional(),
+    status: z.enum(["Draft", "Approved", "Rejected", "Expired"]).optional(),
+}).strict();

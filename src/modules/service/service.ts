@@ -4,6 +4,7 @@ import { CreateServiceDto,
 import serviceRepository from "./repository";
 import { ConflictError } from "../../common/errors/ConflictError";
 import { NotFoundError } from "../../common/errors/NotFoundError";
+import { Transaction } from "sequelize";
 class ServiceService {
   async createService(data: CreateServiceDto) {
     const serviceWithSameName = await serviceRepository.findByName(data.name);
@@ -17,25 +18,25 @@ class ServiceService {
     return serviceRepository.findAll();
   }
 
-  async getServiceById(serviceId: number) {
-    return serviceRepository.findById(serviceId);
+  async getServiceById(serviceId: number,transaction?: Transaction) {
+    return serviceRepository.findById(serviceId, transaction);
   }
 
-  async updateService(id: number, data: Partial<UpdateServiceDto>) {
-    const existingService = await serviceRepository.findById(id);
+  async updateService(id: number, data: Partial<UpdateServiceDto>, transaction?: Transaction) {
+    const existingService = await serviceRepository.findById(id, transaction);
     if (!existingService) {
       throw new NotFoundError("Service not found");
     }
 
-    return serviceRepository.update(id, data);
+    return serviceRepository.update(id, data, transaction);
   }
   
-  async deleteService(id: number) {
-    const existing = await serviceRepository.findById(id);
+  async deleteService(id: number, transaction?: Transaction) {
+    const existing = await serviceRepository.findById(id, transaction);
     if (!existing) {
       throw new NotFoundError("Service not found");
     }
-    return serviceRepository.delete(existing.serviceId);
+    return serviceRepository.delete(existing.serviceId, transaction);
   }
 }
 export default new ServiceService();

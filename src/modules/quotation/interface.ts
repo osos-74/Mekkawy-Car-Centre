@@ -29,3 +29,10 @@ export interface UpdateQuotationDto {
 
     notes?: string;
 }
+export interface FilterQuotationDto {
+    customerId?: number;
+    carId?: number;
+    total?: number;
+    discount?: number;
+    status?: "Draft" | "Approved" | "Rejected" | "Expired";
+}

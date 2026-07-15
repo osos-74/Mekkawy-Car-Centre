@@ -23,11 +23,11 @@ class CarController {
 
     });
 
-    getCarByPhone = asyncHandler(async (req: Request, res: Response) => {
+    // getCarByPhone = asyncHandler(async (req: Request, res: Response) => {
 
-        const car = await carService.getCarByPhone(String(req.params.phone));    
-        res.status(200).json({message : "Car retrieved successfully", car});
-    });
+    //     const car = await carService.getCarByPhone(String(req.params.phone));    
+    //     res.status(200).json({message : "Car retrieved successfully", car});
+    // });
 
     update = asyncHandler(async (req: Request, res: Response) => {
 

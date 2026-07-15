@@ -1,53 +1,68 @@
 import Quotation from "./model";
 import {
     CreateQuotationDto,
+    FilterQuotationDto,
     UpdateQuotationDto
 } from "./interface";
+import { Transaction } from "sequelize";
 
 class QuotationRepository {
 
-    async create(data: CreateQuotationDto) {
+    async create(data: CreateQuotationDto,transaction?: Transaction) {
         return Quotation.create(data);
     }
 
-    async findById(quotationId: number) {
-        return Quotation.findByPk(quotationId);
+    async findById(quotationId: number,
+        transaction?: Transaction
+) {
+        return Quotation.findByPk(quotationId, { transaction });
     }
 
 
-    async findAll() {
-        return Quotation.findAll();
+    async findAll(filter: Partial<FilterQuotationDto>,transaction?: Transaction) {
+        return Quotation.findAll({ where: filter, transaction });
     }
 
   
-    async update(
-        quotationId: number,
-        data: UpdateQuotationDto
-    ) {
+  async update(
+    quotation: Quotation,
+    data: UpdateQuotationDto,
+    transaction?: Transaction
+) {
+    return quotation.update(data, {
+        transaction,
+    });
+}
 
-        const quotation = await this.findById(quotationId);
-
-        if (!quotation) {
-            return null;
+async updateTotals(
+    quotation: Quotation,
+    subtotal: number,
+    total: number,
+    transaction?: Transaction
+) {
+    return quotation.update(
+        {
+            subtotal,
+            total,
+        },
+        {
+            transaction,
         }
+    );
+}
+    async delete(quotationId: number,transaction?: Transaction) {
 
-        await quotation.update(data);
-
-        return quotation;
-    }
-
-    async delete(quotationId: number) {
-
-        const quotation = await this.findById(quotationId);
+        const quotation = await this.findById(quotationId, transaction);
 
         if (!quotation) {
             return false;
         }
 
-        await quotation.destroy();
+        await quotation.destroy({transaction});
 
         return true;
     }
+ //find quotation by quotation line id
 
 }
 

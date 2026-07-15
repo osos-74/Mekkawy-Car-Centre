@@ -4,29 +4,31 @@ import {
     UpdateCarDto,
     filterCarDto
 } from "./interface";
-
+import { Transaction } from "sequelize";
 class CarRepository {
 
-    async create(data: CreateCarDto) {
-        return Car.create(data);
+    async create(data: CreateCarDto, transaction?: Transaction) {
+        return Car.create(data, { transaction });
     }
 
-    async findByEngineNumber(engineNumber: string) {
+    async findByEngineNumber(engineNumber: string, transaction?: Transaction) {
         return Car.findOne({
             where: {
                 engineNumber
-            }
+            },
+            transaction
         });
     }
-    async findById(carId: number) {
-        return Car.findByPk(carId);
+    async findById(carId: number, transaction?: Transaction) {
+        return Car.findByPk(carId, { transaction });
     }
 
-    async findByCustomerId(customerId: number) {
+    async findByCustomerId(customerId: number, transaction?: Transaction) {
         return Car.findAll({
             where: {
                 customerId
-            }
+            },
+            transaction
         });
     }
 
@@ -38,22 +40,23 @@ class CarRepository {
     //     });
     // }
 
-    async findAll(filter: Partial<filterCarDto> ) {
-        return Car.findAll({ where: filter });
+    async findAll(filter: Partial<filterCarDto>, transaction?: Transaction) {
+        return Car.findAll({ where: filter, transaction });
     }
 
     async update(
         carId: number,
-        data: UpdateCarDto
+        data: UpdateCarDto,
+        transaction?: Transaction
     ) {
 
-        const car = await this.findById(carId);
+        const car = await this.findById(carId, transaction);
 
         if (!car) {
             return null;
         }
 
-        await car.update(data);
+        await car.update(data, { transaction });
 
         return car;
     }

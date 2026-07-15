@@ -8,6 +8,9 @@ import customerRoutes from "./modules/customer/routes";
 import carRoutes from "./modules/car/routes";
 import partRoutes from "./modules/part/routes";
 import serviceRoutes from "./modules/service/routes";
+import quotationRoutes from "./modules/quotation/routes";
+import quotationLineRoutes from "./modules/quotationLine/routes";
+
 
 
 
@@ -25,7 +28,8 @@ app.use("/api/customers", customerRoutes);
 app.use("/api/cars", carRoutes);
 app.use("/api/parts", partRoutes);
 app.use("/api/services", serviceRoutes);
-
+app.use("/api/quotations", quotationRoutes);
+app.use("/api/quotation-lines", quotationLineRoutes);
   app.listen(process.env.PORT, () => {
     console.log(`Server running on port ${process.env.PORT}`);
   });
