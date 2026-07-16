@@ -5,11 +5,15 @@ import { QuotationPdfData, QuotationPdfLine } from "./interface";
 import Quotation from "../model";
 import Car from "../../car/model";
 import Customer from "../../customer/model";
-import { Colors } from "./color";
 
-import { Layout } from "./layout";
+import { CompanyInfo } from "../../../common/pdf/CompanyInfo";
+import { Colors } from "../../../common/pdf/Colors";
+import { Layout } from "../../../common/pdf/Layout";
+import { table } from "console";
 
-export class QuotationPdfGenerator {
+import { BasePdfGenerator } from "../../../common/pdf/BasePdfGenerator";
+
+export class QuotationPdfGenerator extends BasePdfGenerator {
   public generate(data: QuotationPdfData): PDFKit.PDFDocument {
     const doc = new PDFDocument({
       size: "A4",
@@ -26,9 +30,11 @@ export class QuotationPdfGenerator {
     this.drawHeaderBorder(doc);
     this.drawDetailsSection(doc, data);
 
-    const tableEndY = this.drawItemsTable(doc, data);
+    var tableEndY = this.drawItemsTable(doc, data);
 
-    this.drawTotals(doc, data.quotation, tableEndY + 20);
+    tableEndY = this.drawTotals(doc, data.quotation, tableEndY + 20);
+    tableEndY = this.drawNotes(doc, data.quotation.notes, tableEndY+20);
+    this.drawSignatureSection(doc, tableEndY+20);
 
     doc.end();
 
@@ -46,41 +52,8 @@ export class QuotationPdfGenerator {
 
     this.drawQuotationInfo(doc, quotation);
   }
-  private drawLogo(doc: PDFKit.PDFDocument): void {
-    const logoPath = path.join(process.cwd(), "src", "assets", "logo.png");
-
-    if (!fs.existsSync(logoPath)) {
-      return;
-    }
-
-    doc.image(logoPath, Layout.logo.x, Layout.logo.y, {
-      width: Layout.logo.width,
-      height: Layout.logo.height,
-    });
-  }
-  private drawCompanyInfo(doc: PDFKit.PDFDocument): void {
-    let y = Layout.company.y;
-
-    doc
-      .font("Helvetica-Bold")
-      .fontSize(20)
-      .text("MEKKAWY CAR CENTRE", Layout.company.x, y);
-
-    y += 28;
-
-    doc
-      .font("Helvetica")
-      .fontSize(12)
-      .text("Car Maintenance & Repair", Layout.company.x, y);
-
-    y += 20;
-
-    doc.fontSize(10).text("New Cairo, Egypt", Layout.company.x, y);
-
-    y += 15;
-
-    doc.text("Phone: +20 XXX XXX XXXX", Layout.company.x, y);
-  }
+  
+  
 
   private drawQuotationInfo(
     doc: PDFKit.PDFDocument,
@@ -139,31 +112,7 @@ export class QuotationPdfGenerator {
       .restore();
   }
 
-  private drawSectionBox(
-    doc: PDFKit.PDFDocument,
-    title: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-  ): void {
-    // Border
-    doc
-      .lineWidth(1)
-      .strokeColor(Colors.border)
-      .rect(x, y, width, height)
-      .stroke();
-
-    // Title background
-    doc.fillColor(Colors.tableHeaderBackground).rect(x, y, width, 25).fill();
-
-    // Title
-    doc
-      .fillColor(Colors.text)
-      .font("Helvetica-Bold")
-      .fontSize(11)
-      .text(title, x + 10, y + 7);
-  }
+ 
 
   private drawDetailsSection(
     doc: PDFKit.PDFDocument,
@@ -224,19 +173,7 @@ export class QuotationPdfGenerator {
 
     this.drawLabelValue(doc, "Plate", car.plateNumber, x, y);
   }
-  private drawLabelValue(
-    doc: PDFKit.PDFDocument,
-    label: string,
-    value: string,
-    x: number,
-    y: number,
-  ): void {
-    doc.font("Helvetica-Bold").fontSize(10).text(`${label}:`, x, y, {
-      width: 60,
-    });
-
-    doc.font("Helvetica").text(value, x + 65, y);
-  }
+ 
   private drawItemsTable(
     doc: PDFKit.PDFDocument,
     data: QuotationPdfData,
@@ -329,9 +266,9 @@ export class QuotationPdfGenerator {
       line.type,
       line.description,
       String(line.quantity),
-      this.formatMoney(line.unitPrice),
-      this.formatMoney(line.discount),
-      this.formatMoney(line.lineTotal),
+      super.formatMoney(line.unitPrice),
+      super.formatMoney(line.discount),
+      super.formatMoney(line.lineTotal),
     ];
     let currentX = Layout.table.x;
 
@@ -347,14 +284,12 @@ export class QuotationPdfGenerator {
     });
   }
 
-  private formatMoney(value: number): string {
-    return value.toFixed(2);
-  }
+ 
   private drawTotals(
     doc: PDFKit.PDFDocument,
     quotation: Quotation,
     y: number,
-  ): void {
+  ): number {
     const x = Layout.totals.x;
 
     doc.fontSize(10).fillColor(Colors.text);
@@ -389,5 +324,45 @@ export class QuotationPdfGenerator {
     doc.font("Helvetica-Bold").fontSize(12);
 
     this.drawLabelValue(doc, "TOTAL", this.formatMoney(quotation.total), x, y);
+    return doc.y;
+  }
+  private drawNotes(
+    doc: PDFKit.PDFDocument,
+    notes: string | null,
+    y: number,
+  ): number {
+    doc.font("Helvetica-Bold").fontSize(11).text("Notes", Layout.notes.x, y);
+
+    y += 20;
+
+    doc
+      .font("Helvetica")
+      .fontSize(10)
+      .text(notes ?? "No additional notes.", Layout.notes.x, y, {
+        width: Layout.notes.width,
+      });
+
+    return doc.y;
+  }
+  private drawSignatureSection(doc: PDFKit.PDFDocument, y: number): void {
+    doc
+      .moveTo(Layout.signature.leftX, y)
+      .lineTo(Layout.signature.leftX + Layout.signature.width, y)
+      .stroke();
+
+    doc.text("Customer Signature", Layout.signature.leftX, y + 5, {
+      width: Layout.signature.width,
+      align: "center",
+    });
+
+    doc
+      .moveTo(Layout.signature.rightX, y)
+      .lineTo(Layout.signature.rightX + Layout.signature.width, y)
+      .stroke();
+
+    doc.text("Authorized Signature", Layout.signature.rightX, y + 5, {
+      width: Layout.signature.width,
+      align: "center",
+    });
   }
 }
