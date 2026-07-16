@@ -37,54 +37,43 @@ class QuotationService {
     return quotationRepository.findById(quotationId,transaction);
   }
 
-// async updateInfo(
-//     quotationId: number,
-//     data: UpdateQuotationDto
-// ) {
+async updateInfo(
+    quotationId: number,
+    data: UpdateQuotationDto,
+    
+) {
 
-//     const transaction = await sequelize.transaction();
+return sequelize.transaction(async (transaction) => {  
+   
 
-//     try {
+        const quotation = await quotationRepository.findById(quotationId, transaction);
 
-//         const quotation =
-//             await quotationRepository.findById(
-//                 quotationId,
-//                 transaction
-//             );
+        if (!quotation) {
+            throw new NotFoundError("Quotation not found");
+        }
 
-//         if (!quotation) {
-//             throw new NotFoundError("Quotation not found");
-//         }
+        await quotationRepository.update(
+            quotation,
+            data,
+            transaction
+        );
 
-//         await quotationRepository.update(
-//             quotationId,
-//             data,
-//             transaction
-//         );
+        // Only recalculate if the quotation discount changed
+        if (data.discount !== undefined) {
 
-//         // Only recalculate if the quotation discount changed
-//         if (data.discount !== undefined) {
+            await this.recalculateTotals(
+                quotationId,
+                transaction
+            );
 
-//             await this.recalculateTotals(
-//                 quotationId,
-//                 transaction
-//             );
+        }
 
-//         }
 
-//         await transaction.commit();
+        return quotationRepository.findById(quotationId);
 
-//         return quotationRepository.findById(quotationId);
+    });
 
-//     } catch (error) {
-
-//         await transaction.rollback();
-
-//         throw error;
-
-//     }
-
-// }
+}
   
   async deleteQuotation(id: number) {
      return sequelize.transaction(async (transaction) => {
@@ -120,7 +109,6 @@ private async recalculateTotals(
             quotationId,
             transaction
         );
-                  console.log("quotationLine length",quotationLines.length);
 
         if(quotationLines.length === 0) {
           console.log("quotationLine length",quotationLines.length);
@@ -142,6 +130,9 @@ private async recalculateTotals(
 
     const total =
         subtotal - Number(quotation.discount);
+        if(total < 0) {
+          throw new ConflictError("Total cannot be negative");
+        }
     await quotationRepository.updateTotals(
         quotation,
         subtotal,
@@ -258,14 +249,15 @@ async deleteQuotationLine(quotationLineId: number) {
 
     return sequelize.transaction(async (transaction) => {
       // After deleting the line, recalculate totals for the associated quotation
-      const quotation = await this.getQuotationById(quotationLineId, transaction);
-      console.log(quotation?.quotationId, "quotationId");
-      if (!quotation) {
-        throw new NotFoundError("Quotation not found");
+      const quotationLine = await quotationLineRepository.findById(quotationLineId, transaction);
+
+      console.log(quotationLine?.quotationId, "quotationId");
+      if (!quotationLine) {
+        throw new NotFoundError("Quotation line not found");
       }
       await quotationLineRepository.delete(quotationLineId, transaction);
-      if (quotation) {
-        await this.recalculateTotals(quotation.quotationId, transaction);
+      if (quotationLine?.quotationId) {
+        await this.recalculateTotals(quotationLine.quotationId, transaction);
       }
 
     });

@@ -38,13 +38,16 @@ class QuotationController {
     // });
 
 
-    // update = asyncHandler(async (req: Request, res: Response) => {
+    update = asyncHandler(async (req: Request, res: Response) => {
 
-    //     const quotation = await quotationService.updateQuotation(Number(req.params.id), req.body); 
+        const quotation = await quotationService.updateInfo(Number(req.params.id), req.body); 
+        if(!quotation){
+            return res.status(404).json({ message: "Quotation not found" });
+        }
 
-    //     res.status(200).json({message : "Quotation updated successfully", quotation});
+        res.status(200).json({message : "Quotation updated successfully", quotation});
 
-    // });
+    });
 
     deleteQuotation = asyncHandler(async (req: Request, res: Response) => {
 

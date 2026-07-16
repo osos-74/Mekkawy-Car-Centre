@@ -8,7 +8,7 @@ import quotationController from"./controller"
 import { createQuotationLineSchema } from "../quotationLine/validation";
 router.post("/", validate(createQuotationSchema),quotationController.create);
 router.get("/", validate(filterQuotationSchema,"query"), quotationController.getQuotations);
-// router.put("/:id", validate(updateQuotationSchema),quotationController.update);
+router.put("/:id", validate(updateQuotationSchema),quotationController.update);
 router.delete("/:id",quotationController.deleteQuotation);
 router.post(
     "/add-line",
