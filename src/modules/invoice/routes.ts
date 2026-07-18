@@ -26,4 +26,10 @@ router.get(
   invoiceController.generatePdf,
 );
 
+router.get(
+  "/invoice-pdf/:id",
+  validate(invoiceIdSchema,"params"),
+  invoiceController.getInvoicePdfData,
+);
+
 export default router;

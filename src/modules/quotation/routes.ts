@@ -11,6 +11,8 @@ import { createQuotationLineSchema } from "../quotationLine/validation";
 router.post("/", validate(createQuotationSchema),quotationController.create);
 router.get("/", validate(filterQuotationSchema,"query"), quotationController.getQuotations);
 router.put("/:id", validate(updateQuotationSchema),quotationController.update);
+router.put("/:id/approve",validate(quotationIdSchema,"params"),quotationController.approveQuotation)
+
 router.delete("/:id",quotationController.deleteQuotation);
 router.post(
     "/add-line",
@@ -19,6 +21,7 @@ router.post(
 );
 router.get("/:id/pdf",validate(quotationIdSchema,"params"),quotationController.generatePdf)
 router.delete("/delete-line/:id",quotationController.deleteLine);
+router.get("/quotation-pdf/:id",validate(quotationIdSchema,"params"),quotationController.getQuotationPdfData)
 // router.get("/", quotationController.getQuotations);
 // router.get('/:id',quotationController.getQuotationById)
 // router.get('/id/:customerId',customerController.getCustomerById)

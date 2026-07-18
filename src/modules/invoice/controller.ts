@@ -54,6 +54,16 @@ generatePdf = asyncHandler(async (req, res) => {
       message: "Invoice printed successfully.",
     });
 });
+
+ getInvoicePdfData = asyncHandler(async (req: Request, res: Response) => {
+     const invoicePdfData = await invoiceService.getInvoicePdfData(
+       Number(req.params.id),
+     );
+     res
+       .status(200)
+       .json({ message: "Invoice PDF Data Retrieved", invoicePdfData });
+   });
+
 }
 
 export default new InvoiceController();

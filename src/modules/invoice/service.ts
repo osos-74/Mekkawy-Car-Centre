@@ -131,5 +131,6 @@ class InvoiceService {
     const pdf = await generator.generate(pdfData);
     if (!pdf) throw new Error("pdf not created");
   }
+  
 }
 export default new InvoiceService();
