@@ -9,7 +9,7 @@ import { BadRequestError } from "../../common/errors/BadRequestError";
 import { NotFoundError } from "../../common/errors/NotFoundError";
 
 class InventoryService {
-    async checkAvailability(
+   private async checkAvailability(
         items: InventoryItem[],
         transaction?: Transaction
     ): Promise<InventoryAvailability[]> {

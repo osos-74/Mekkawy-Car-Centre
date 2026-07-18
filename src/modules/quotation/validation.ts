@@ -46,3 +46,6 @@ export const filterQuotationSchema = z.object({
     discount: z.coerce.number().optional(),
     status: z.enum(["Draft", "Approved", "Rejected", "Expired"]).optional(),
 }).strict();
+export const quotationIdSchema = z.object({
+    id: z.coerce.number().int().positive(),
+});

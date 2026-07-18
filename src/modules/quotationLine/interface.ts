@@ -1,19 +1,33 @@
 export interface CreateQuotationLineDto {
-    quotationId: number;
+  quotationId: number;
 
-    type: "PART" | "SERVICE";
+  type: "PART" | "SERVICE";
 
-    partId?: number;
+  partId?: number;
 
-    serviceId?: number;
+  serviceId?: number;
 
-    quantity: number;
+  quantity: number;
 
-    discount?: number;
+  discount?: number;
 }
 
 export interface UpdateQuotationLineDto {
-    quantity?: number;
+  quantity?: number;
 
-    discount?: number;
+  discount?: number;
+}
+export interface QuotationLineAttributes {
+  quotationLineId: number;
+
+  quotationId: number;
+
+  type: "PART" | "SERVICE";
+  partId: number | undefined;
+  serviceId: number | undefined;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  discount: number;
+  lineTotal: number;
 }

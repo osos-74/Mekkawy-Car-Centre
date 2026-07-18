@@ -1,6 +1,8 @@
 import database from "../config/database";
 import sequelize from "../config/database";
 import "./associations";
+import JobOrder from "../modules/jobOrder/model";
+import JobOrderLine from "../modules/jobOrderLine/model";
 
 import Customer from "../modules/customer/model";
 

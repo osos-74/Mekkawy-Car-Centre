@@ -10,6 +10,8 @@ import serviceRepository from "../service/repository";
 import quotationLineRepository from "../quotationLine/repository";
 import sequelize from "../../config/database";
 import carRepository from "../car/repository";
+import carService from "../car/service";
+import customerService from "../customer/service";
 
 import { ConflictError } from "../../common/errors/ConflictError";
 import { NotFoundError } from "../../common/errors/NotFoundError";
@@ -17,6 +19,12 @@ import { CreateQuotationLineDto } from "../quotationLine/interface";
 import { Transaction } from "sequelize";
 import partService from "../part/service";
 import serviceService from "../service/service";
+import inventoryService from "../inventory/service";
+import jobOrderLineRepository from "../jobOrderLine/repository";
+import jobOrderService from "../jobOrder/service";
+import { QuotationPdfGenerator } from "./pdf/quotationPdfGenerator";
+import { QuotationPdfData } from "./pdf/interface";
+
 class QuotationService {
   async createQuotation(data: CreateQuotationDto) {
     const existing = await customerRepository.findById(data.customerId);
@@ -38,7 +46,11 @@ class QuotationService {
     return quotationRepository.findById(quotationId, transaction);
   }
 
-  async updateInfo(quotationId: number, data: UpdateQuotationDto) {
+  async updateInfo(
+    quotationId: number,
+    data: UpdateQuotationDto,
+    transaction?: Transaction,
+  ) {
     return sequelize.transaction(async (transaction) => {
       const quotation = await quotationRepository.findById(
         quotationId,
@@ -161,7 +173,9 @@ class QuotationService {
         dto.quotationId,
         transaction,
       );
-
+      if (quotation?.status == "Approved") {
+        throw new Error("Can't edit Approved quoatation");
+      }
       if (!quotation) {
         throw new NotFoundError("Quotation not found");
       }
@@ -183,12 +197,18 @@ class QuotationService {
       );
       if (existingLine) {
         console.log("Found existing line:", existingLine);
-        console.log("Existing quantity:", existingLine.quantity);
-        console.log("Adding quantity:", dto.quantity);
-        const newQuantity = Number(existingLine.quantity) + dto.quantity;
-        console.log("new quantity:", existingLine.quantity);
-        existingLine.lineTotal =
-          existingLine.quantity * itemData.unitPrice - discount;
+        console.log(
+          "Existing quantity:",
+          existingLine.quantity,
+          typeof existingLine.quantity,
+        );
+        console.log("Adding quantity:", dto.quantity, typeof dto.quantity);
+
+        const newQuantity =
+          Number(existingLine.quantity) + Number(dto.quantity);
+
+        console.log("Calculated:", newQuantity, typeof newQuantity);
+        existingLine.lineTotal = newQuantity * itemData.unitPrice - discount;
         await quotationLineRepository.update(
           existingLine.quotationLineId,
           {
@@ -234,11 +254,93 @@ class QuotationService {
       }
     });
   }
-  async approveQuotation(quotationId:number)
-  {
-    const quotation=await this.getQuotationById(quotationId)
-    if(!quotation)
-      throw new NotFoundError()
+  async getQuotationPdfData(quotationId: number): Promise<QuotationPdfData> {
+    const quotation = await quotationRepository.findById(quotationId);
+
+    if (!quotation) {
+      throw new NotFoundError("Quotation not found");
+    }
+
+    const customer = await customerService.getCustomerById(
+      quotation.customerId,
+    );
+    if (!customer) throw new NotFoundError("Customer not found");
+
+    const car = await carRepository.findById(quotation.carId);
+    if (!car)
+       throw new NotFoundError("Car not found");
+    const quotationLines =
+      await quotationLineRepository.findByQuotationId(quotationId);
+    if(!quotationLines)
+      throw new NotFoundError("Quotation Lines not found")
+    return {
+      quotation: quotation.toJSON(),
+      customer: customer.toJSON(),
+      car: car.toJSON(),
+      quotationLines: quotationLines.map((line) => line.toJSON()),
+    };
+  }
+  async generateQuotationpdf(quotationId: number) {
+    const generator = new QuotationPdfGenerator();
+    const pdfData = await this.getQuotationPdfData(quotationId)
+    if(!pdfData)
+    {
+      throw new NotFoundError("Quotation PDf Data not found")
+    }
+    
+    const pdf = await generator.generate(pdfData);
+    if (!pdf) throw new Error("pdf not created");
+  }
+  async approveQuotation(quotationId: number) {
+    //add jobOrderData parameter to this function
+    return sequelize.transaction(async (transaction) => {
+      const quotation = await this.getQuotationById(quotationId, transaction);
+      if (!quotation) throw new NotFoundError("Quotation Not Found");
+
+      const quotationLines = await quotationLineRepository.findByQuotationId(
+        quotationId,
+        transaction,
+      );
+      if (quotationLines.length === 0)
+        throw new NotFoundError("Quotation Lines not found");
+      const items = quotationLines
+        .filter((line) => line.partId)
+        .map((line) => ({
+          partId: line.partId!,
+          quantity: line.quantity,
+        }));
+
+      await inventoryService.consumeParts(items, transaction);
+      const jobOrderData = {
+        quotationId: quotationId,
+        mileage: 100,
+        notes: "notes",
+        assignedTechnician: "Nasr",
+      };
+      // const jobOrder = await jobOrderService.createJobOrder(
+      //   jobOrderData,
+      //   transaction,
+      // );
+      // console.log(jobOrder)
+      // for (const line of quotationLines) {
+      //   console.log("at joborderLine repository");
+
+      //   await jobOrderLineRepository.create(
+      //     {
+      //       jobOrderId:jobOrder.jobOrderId,
+      //       type: line.type,
+      //       partId: line.partId ?? undefined,
+      //       serviceId: line.serviceId ?? undefined,
+      //       description: line.description,
+      //       quantity: Number(line.quantity),
+      //     },
+      //     transaction,
+      //   );
+
+      // }
+
+      await this.updateInfo(quotationId, { status: "Approved" }, transaction);
+    });
   }
 }
 export default new QuotationService();

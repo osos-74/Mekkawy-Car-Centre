@@ -12,7 +12,7 @@ class CarService {
     if (existing) {
       throw new ConflictError("Engine number already exists");
     }
-    
+
 
     return carRepository.create(data);
   }
@@ -35,6 +35,7 @@ async updateCar(id: number, data: Partial<CreateCarDto>) {
     return await carRepository.update(id, data);
  
 }
+
   // async deleteCustomer(id: number) {
   //   const existing = await customerRepository.findById(id);
   //   if (!existing) {

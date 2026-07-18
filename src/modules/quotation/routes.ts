@@ -2,10 +2,12 @@ const express = require('express');
 const cors = require("cors");
 const router = express.Router();
 import validate from "../../common/middleware/validate"
-import {createQuotationSchema,updateQuotationSchema,filterQuotationSchema} from "./validation";
+import {createQuotationSchema,updateQuotationSchema,filterQuotationSchema,quotationIdSchema} from "./validation";
 
 import quotationController from"./controller"
 import { createQuotationLineSchema } from "../quotationLine/validation";
+
+
 router.post("/", validate(createQuotationSchema),quotationController.create);
 router.get("/", validate(filterQuotationSchema,"query"), quotationController.getQuotations);
 router.put("/:id", validate(updateQuotationSchema),quotationController.update);
@@ -15,6 +17,7 @@ router.post(
     validate(createQuotationLineSchema),
     quotationController.addLine
 );
+router.get("/:id/pdf",validate(quotationIdSchema,"params"),quotationController.generatePdf)
 router.delete("/delete-line/:id",quotationController.deleteLine);
 // router.get("/", quotationController.getQuotations);
 // router.get('/:id',quotationController.getQuotationById)

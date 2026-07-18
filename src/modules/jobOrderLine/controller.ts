@@ -58,7 +58,6 @@ class QuotationLineController {
         res.sendStatus(204);
 
     });
-   
 
 }
 

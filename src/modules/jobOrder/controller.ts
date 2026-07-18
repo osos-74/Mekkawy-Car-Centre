@@ -61,13 +61,6 @@ class QuotationController {
         res.status(200).json({ message: "Quotation line deleted successfully" });
         
     })
-
-      generatePdf = asyncHandler(async (req: Request, res: Response) => {
-
-        await quotationService.generateQuotationpdf(Number(req.params.id));    
-        res.status(200).json({ message: "Quotation printed successfully" });
-        
-    })
 }
 
 export default new QuotationController();
