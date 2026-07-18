@@ -35,7 +35,7 @@ export const Layout = {
     y: 40,
   },
 
-  quotation: {
+  invoice: {
     x: 400,
     y: 40,
   },

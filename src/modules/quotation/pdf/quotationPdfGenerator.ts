@@ -8,7 +8,7 @@ import Customer from "../../customer/model";
 
 import { CompanyInfo } from "../../../common/pdf/CompanyInfo";
 import { Colors } from "../../../common/pdf/Colors";
-import { Layout } from "../../../common/pdf/Layout";
+import { Layout } from "./layout";
 import { table } from "console";
 
 import { BasePdfGenerator } from "../../../common/pdf/BasePdfGenerator";

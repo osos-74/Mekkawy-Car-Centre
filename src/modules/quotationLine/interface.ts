@@ -23,8 +23,8 @@ export interface QuotationLineAttributes {
   quotationId: number;
 
   type: "PART" | "SERVICE";
-  partId: number | undefined;
-  serviceId: number | undefined;
+  partId: number | null;
+  serviceId: number | null;
   description: string;
   quantity: number;
   unitPrice: number;

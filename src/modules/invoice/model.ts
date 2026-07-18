@@ -28,8 +28,8 @@ class Invoice extends Model<
 
   declare notes: string | null;
 
-  declare createdAt: NonAttribute<Date>;
-  declare updatedAt: NonAttribute<Date>;
+  declare createdAt: CreationOptional<Date>;
+  declare updatedAt: CreationOptional<Date>;
 }
 
 Invoice.init(
@@ -78,6 +78,17 @@ Invoice.init(
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    createdAt: {
+  type: DataTypes.DATE,
+  allowNull: false,
+  field: "created_at",
+},
+
+updatedAt: {
+  type: DataTypes.DATE,
+  allowNull: false,
+  field: "updated_at",
+},
   },
   {
     sequelize,

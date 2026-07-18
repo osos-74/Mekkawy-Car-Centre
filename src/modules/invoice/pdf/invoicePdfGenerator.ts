@@ -1,31 +1,33 @@
 import PDFDocument from "pdfkit";
 import fs from "fs";
 import path from "path";
-import { QuotationPdfData, QuotationPdfLine } from "./interface";
+import { InvoicePdfData, QuotationPdfLine } from "./interface";
 import Quotation from "../model";
 import Car from "../../car/model";
 import Customer from "../../customer/model";
-
+import {InvoiceAttributes} from "../interface"
 import { CompanyInfo } from "../../../common/pdf/CompanyInfo";
 import { Colors } from "../../../common/pdf/Colors";
 import { Layout } from "../../../common/pdf/Layout";
 import { table } from "console";
-import {Invoice} from "../interface"
 import { BasePdfGenerator } from "../../../common/pdf/BasePdfGenerator";
-import {PdfDocumentData} from "../../../common/pdf/interface"
+import Invoice from "../model";
+import { QuotationAttributes } from "../../quotation/interface";
+import { CustomerAttributes } from "../../customer/interface";
+import { CarAttributes } from "../../car/interface";
 export class InvoicePdfGenerator extends BasePdfGenerator {
-  public generate(data: PdfDocumentData): PDFKit.PDFDocument {
+  public generate(data: InvoicePdfData): PDFKit.PDFDocument {
     const doc = new PDFDocument({
       size: "A4",
       margin: 40,
     });
 
-    const outputPath = path.join(process.cwd(), "quotation.pdf");
+    const outputPath = path.join(process.cwd(), "Invoice.pdf");
 
     doc.pipe(fs.createWriteStream(outputPath));
     this.drawHeaderBackground(doc);
 
-    this.drawHeader(doc, data.quotation);
+    this.drawHeader(doc, data.invoice);
 
     this.drawHeaderBorder(doc);
     this.drawDetailsSection(doc, data);
@@ -45,26 +47,26 @@ export class InvoicePdfGenerator extends BasePdfGenerator {
     return `QT-${id.toString().padStart(6, "0")}`;
   }
 
-  private drawHeader(doc: PDFKit.PDFDocument, quotation: Quotation): void {
+  private drawHeader(doc: PDFKit.PDFDocument, invoice: InvoiceAttributes): void {
     this.drawLogo(doc);
 
     this.drawCompanyInfo(doc);
 
-    this.drawInvoiceInfo(doc, quotation);
+    this.drawInvoiceInfo(doc, invoice);
   }
   
   
 
   private drawInvoiceInfo(
     doc: PDFKit.PDFDocument,
-    invoice: Invoice,
+    invoice: InvoiceAttributes,
   ): void {
-    let y = Layout.quotation.y;
+    let y = Layout.invoice.y;
 
     doc
       .font("Helvetica-Bold")
       .fontSize(16)
-      .text("QUOTATION", Layout.quotation.x, y);
+      .text("INVOICE", Layout.invoice.x, y);
 
     y += 28;
 
@@ -73,7 +75,7 @@ export class InvoicePdfGenerator extends BasePdfGenerator {
       .fontSize(10)
       .text(
         `No: ${this.formatQuotationNumber(invoice.invoiceId)}`,
-        Layout.quotation.x,
+        Layout.invoice.x,
         y,
       );
 
@@ -81,13 +83,13 @@ export class InvoicePdfGenerator extends BasePdfGenerator {
 
     doc.text(
       `Date: ${invoice.createdAt?.toLocaleDateString()}`,
-      Layout.quotation.x,
+      Layout.invoice.x,
       y,
     );
 
     y += 18;
 
-    doc.text(`Status: ${invoice.status}`, Layout.quotation.x, y);
+    doc.text(`Status: ${invoice.status}`, Layout.invoice.x, y);
   }
 
   private drawHeaderBorder(doc: PDFKit.PDFDocument): void {
@@ -116,7 +118,7 @@ export class InvoicePdfGenerator extends BasePdfGenerator {
 
   private drawDetailsSection(
     doc: PDFKit.PDFDocument,
-    data: QuotationPdfData,
+    data: InvoicePdfData,
   ): void {
     this.drawSectionBox(
       doc,
@@ -140,7 +142,7 @@ export class InvoicePdfGenerator extends BasePdfGenerator {
     this.drawVehicleInfo(doc, data.car);
   }
 
-  private drawCustomerInfo(doc: PDFKit.PDFDocument, customer: Customer): void {
+  private drawCustomerInfo(doc: PDFKit.PDFDocument, customer: CustomerAttributes): void {
     const x = Layout.details.customerX + 10;
     let y = Layout.details.y + 35;
 
@@ -155,7 +157,7 @@ export class InvoicePdfGenerator extends BasePdfGenerator {
     this.drawLabelValue(doc, "Address", customer.address, x, y);
   }
 
-  private drawVehicleInfo(doc: PDFKit.PDFDocument, car: Car): void {
+  private drawVehicleInfo(doc: PDFKit.PDFDocument, car: CarAttributes): void {
     const x = Layout.details.vehicleX + 10;
     let y = Layout.details.y + 35;
 
@@ -176,9 +178,9 @@ export class InvoicePdfGenerator extends BasePdfGenerator {
  
   private drawItemsTable(
     doc: PDFKit.PDFDocument,
-    data: PdfDocumentData,
+    data: InvoicePdfData,
   ): number {
-    const tableHeight = this.calculateTableHeight(data.lines.length);
+    const tableHeight = this.calculateTableHeight(data.quotationLines.length);
     // Outer border
     doc
       .lineWidth(1)
@@ -240,7 +242,7 @@ export class InvoicePdfGenerator extends BasePdfGenerator {
   private calculateTableHeight(rowCount: number): number {
     return Layout.table.headerHeight + rowCount * Layout.table.rowHeight;
   }
-  private drawTableRows(doc: PDFKit.PDFDocument, data: QuotationPdfData): void {
+  private drawTableRows(doc: PDFKit.PDFDocument, data: InvoicePdfData): void {
     let y = Layout.table.y + Layout.table.headerHeight;
 
     data.quotationLines.forEach((line, index) => {
@@ -287,7 +289,7 @@ export class InvoicePdfGenerator extends BasePdfGenerator {
  
   private drawTotals(
     doc: PDFKit.PDFDocument,
-    quotation: Quotation,
+    quotation: QuotationAttributes,
     y: number,
   ): number {
     const x = Layout.totals.x;

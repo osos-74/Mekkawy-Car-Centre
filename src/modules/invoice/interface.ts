@@ -31,7 +31,7 @@ export type InvoiceStatus =
 
     paidAt?: Date | null;
 }
-export interface Invoice {
+export interface InvoiceAttributes {
   invoiceId: number;
 
   quotationId: number;
@@ -49,10 +49,10 @@ export interface Invoice {
   createdAt: Date;
   updatedAt: Date;
 }
-interface InvoicePdfData {
-    invoice: Invoice;
-    quotation: QuotationAttributes;
-    customer: CustomerAttributes;
-    car: CarAttributes;
-    quotationLines: QuotationLineAttributes[];
-}
+// interface InvoicePdfData {
+//     invoice: Invoice;
+//     quotation: QuotationAttributes;
+//     customer: CustomerAttributes;
+//     car: CarAttributes;
+//     quotationLines: QuotationLineAttributes[];
+// }
