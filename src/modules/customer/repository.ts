@@ -25,24 +25,28 @@ class CustomerRepository {
         });
     }
 
-   async getAllCustomers(filters: CustomerFilterDto) {
-    const where: any = {};
-
-    if (filters.name) {
-        where.name = {
-            [Op.like]: `%${filters.name}%`,
-        };
-    }
-
-    if (filters.phone) {
-        where.phoneNumber = filters.phone;
-    }
-
-    if (filters.address) {
-        where.address = {
-            [Op.like]: `%${filters.address}%`,
-        };
-    }
+  async getAllCustomers(filters: CustomerFilterDto) {
+    const where = filters.search
+        ? {
+              [Op.or]: [
+                  {
+                      name: {
+                          [Op.like]: `%${filters.search}%`,
+                      },
+                  },
+                  {
+                      phoneNumber: {
+                          [Op.like]: `%${filters.search}%`,
+                      },
+                  },
+                  {
+                      address: {
+                          [Op.like]: `%${filters.search}%`,
+                      },
+                  },
+              ],
+          }
+        : undefined;
 
     return Customer.findAll({ where });
 }

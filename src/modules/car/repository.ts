@@ -5,6 +5,7 @@ import {
     filterCarDto
 } from "./interface";
 import { Transaction } from "sequelize";
+import { Op } from "sequelize";
 class CarRepository {
 
     async create(data: CreateCarDto, transaction?: Transaction) {
@@ -40,9 +41,41 @@ class CarRepository {
     //     });
     // }
 
-    async findAll(filter: Partial<filterCarDto>, transaction?: Transaction) {
-        return Car.findAll({ where: filter, transaction });
-    }
+    
+      async getAllCars(filters: filterCarDto) {
+    const where = filters.search
+        ? {
+              [Op.or]: [
+                  {
+                      make: {
+                          [Op.like]: `%${filters.search}%`,
+                      },
+                  },
+                  {
+                      model: {
+                          [Op.like]: `%${filters.search}%`,
+                      },
+                  },
+                  {
+                      bodyNumber: {
+                          [Op.like]: `%${filters.search}%`,
+                      },
+                  },
+                   {
+                      engineNumber: {
+                          [Op.like]: `%${filters.search}%`,
+                      },
+                  }, {
+                      plateNumber: {
+                          [Op.like]: `%${filters.search}%`,
+                      },
+                  },
+              ],
+          }
+        : undefined;
+
+    return Car.findAll({ where });
+}
 
     async update(
         carId: number,
@@ -61,18 +94,18 @@ class CarRepository {
         return car;
     }
 
-    // async delete(customerId: number) {
+    async delete(carId: number) {
 
-    //     const customer = await this.findById(customerId);
+        const car = await this.findById(carId);
 
-    //     if (!customer) {
-    //         return false;
-    //     }
+        if (!car) {
+            return false;
+        }
 
-    //     await customer.destroy();
+       const affectedRows= await car.destroy();
 
-    //     return true;
-    // }
+        return affectedRows;
+    }
 
 }
 

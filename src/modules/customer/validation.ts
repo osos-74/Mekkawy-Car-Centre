@@ -25,8 +25,6 @@ export const CustomerIdSchema = z.object({
 });
 
 export const CustomerFilterDtoSchema = z.object({
-  name: z.string().trim().optional(),
-  phone: z.string().trim().optional(),
-  address: z.string().trim().optional(),
+    search: z.string().trim().optional(),
 });
 export const updateCustomerSchema = createCustomerSchema.partial();

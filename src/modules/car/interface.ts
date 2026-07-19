@@ -34,8 +34,5 @@ export interface UpdateCarDto {
 }
 
 export interface filterCarDto {
-    make?: string;
-    model?: string;
-    year?: number;
-    customerId?: number;
+    search?:string
 }   

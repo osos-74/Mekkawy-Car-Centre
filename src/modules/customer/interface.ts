@@ -17,7 +17,5 @@ export interface UpdateCustomerDto {
     address?: string;
 }
 export interface CustomerFilterDto {
-  name?: string;
-  phone?: string;
-  address?: string;
+    search?: string;
 }

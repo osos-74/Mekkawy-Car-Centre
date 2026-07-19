@@ -23,7 +23,12 @@ class CustomerService {
   }
 
  async geAllCustomers(filters: CustomerFilterDto) {
-    return customerRepository.getAllCustomers(filters);
+    const customers=await customerRepository.getAllCustomers(filters);
+      if(customers.length===0)
+      {
+        throw new NotFoundError()
+      }
+
 }
 
   async getCustomerByPhone(phoneNumber: string) {

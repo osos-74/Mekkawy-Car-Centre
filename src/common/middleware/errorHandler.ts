@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { ZodError } from "zod";
 import { AppError } from "../errors/AppError";
+import { NotFoundError } from "../errors/NotFoundError";
 
 export const errorHandler = (
   err: Error,
@@ -16,6 +17,11 @@ export const errorHandler = (
   }
 
   if (err instanceof AppError) {
+    return res.status(err.statusCode).json({
+      message: err.message,
+    });
+  }
+   if (err instanceof NotFoundError) {
     return res.status(err.statusCode).json({
       message: err.message,
     });

@@ -37,12 +37,20 @@ class CarController {
 
     });
 
-//     deleteCustomer = asyncHandler(async (req: Request, res: Response) => {
+    delete = asyncHandler(async (req: Request, res: Response) => {
 
-//         await customerService.deleteCustomer(Number(req.params.id));    
-//         res.status(200).json({ message: "Customer deleted successfully" });
-//     });
+         await carService.delete(Number(req.params.id));    
+        
+        res.status(200).json({ message: "Car deleted successfully" });
+    });
 
+    getCarByCustomerId = asyncHandler(async (req: Request, res: Response) => {
+
+        const cars = await carService.getCarByCustomerId(Number(req.params.id)); 
+
+        res.status(200).json({message : "Car updated successfully", cars});
+
+    });
 }
 
 export default new CarController();

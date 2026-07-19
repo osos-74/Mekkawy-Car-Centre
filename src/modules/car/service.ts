@@ -18,7 +18,7 @@ class CarService {
   }
 
   async getAllCars(filter: filterCarDto) {
-    return carRepository.findAll(filter);
+    return carRepository.getAllCars(filter);
   }
 
   // async getCustomerByPhone(phoneNumber: string) {
@@ -36,25 +36,23 @@ async updateCar(id: number, data: Partial<CreateCarDto>) {
  
 }
 
-  // async deleteCustomer(id: number) {
-  //   const existing = await customerRepository.findById(id);
-  //   if (!existing) {
-  //     throw new NotFoundError("Customer not found");
-  //   }
-  //   return customerRepository.delete(existing.customerId);
-  // }
+  async delete(id: number) {
+  
+    const affectedRows= await carRepository.delete(id);
+    if(!affectedRows)
+    {
+      throw new NotFoundError ("Car Not Found") 
+    }
+  }
 
-//   async getCarByPhone(phoneNumber: string) {
-//     const customer = await customerService.getCustomerByPhone(phoneNumber);  
-//       if (!customer) {
-//         throw new NotFoundError("User Not Registered with this phone number");
-//       }
-//       const car = await carRepository.findByCustomerId(customer.customerId);
-//       if (!car) {
-//         throw new NotFoundError("No Car found for the provided phone number");
-//       }
-//       return car;
-// }
+  async getCarByCustomerId(customerId: number,transaction?:Transaction) {
+   
+      const cars = await carRepository.findByCustomerId(customerId,transaction)
+      if (!cars) {
+        throw new NotFoundError("No Car found ");
+      }
+      return cars;
+}
 
 }
 export default new CarService();
