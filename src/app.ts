@@ -20,13 +20,13 @@ import { errorHandler } from "./common/middleware/errorHandler";
 dotenv.config();
 
 const app = express();
-// app.use(cors());
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "http://localhost:5174"
-  ]
-}));
+app.use(cors());
+// app.use(cors({
+//   origin: [
+//     "http://localhost:5173",
+//     "http://localhost:5174"
+//   ]
+// }));
 app.use(express.json());
 
 async function startServer() {
