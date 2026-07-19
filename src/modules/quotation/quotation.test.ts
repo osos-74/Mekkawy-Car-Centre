@@ -22,4 +22,3 @@ async function main() {
 }
 
 main();
-// zawed l priceee fl job orderr

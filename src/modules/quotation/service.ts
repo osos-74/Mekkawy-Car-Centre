@@ -20,8 +20,6 @@ import { Transaction } from "sequelize";
 import partService from "../part/service";
 import serviceService from "../service/service";
 import inventoryService from "../inventory/service";
-import jobOrderLineRepository from "../jobOrderLine/repository";
-import jobOrderService from "../jobOrder/service";
 import { QuotationPdfGenerator } from "./pdf/quotationPdfGenerator";
 import { QuotationPdfData } from "./pdf/interface";
 
