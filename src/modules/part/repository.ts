@@ -1,9 +1,10 @@
 import Part from "./model";
 import {
     CreatePartDto,
-    UpdatePartDto
+    UpdatePartDto,
+    FilterDto,
 } from "./interface";
-import { Transaction } from "sequelize";
+import { Transaction,Op } from "sequelize";
 class PartRepository {
 
     async create(data: CreatePartDto) {
@@ -15,8 +16,27 @@ class PartRepository {
     }
 
 
-    async findAll(transaction?: Transaction) {
-        return Part.findAll({ transaction });
+    async findAll(filters:FilterDto,transaction?: Transaction) {
+         const where = filters.search
+        ? {
+              [Op.or]: [
+                  {
+                      name: {
+                          [Op.like]: `%${filters.search}%`,
+                      },
+                  },
+                  {
+                      description: {
+                          [Op.like]: `%${filters.search}%`,
+                      },
+                  },
+                
+              ],
+          }
+        : undefined;
+
+    
+        return Part.findAll({where, transaction });
     }
 
     async update(

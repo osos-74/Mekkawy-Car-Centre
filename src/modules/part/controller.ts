@@ -14,8 +14,8 @@ class PartController {
     });
     
     getParts = asyncHandler(async (req: Request, res: Response) => {
-
-        const parts = await partService.getAllParts();
+        const filter = req.query
+        const parts = await partService.getAllParts(filter);
         res.status(200).json({message : "Parts retrieved successfully", parts});
 
     });

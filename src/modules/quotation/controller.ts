@@ -57,10 +57,10 @@ class QuotationController {
   });
 
   generatePdf = asyncHandler(async (req: Request, res: Response) => {
-    await quotationService.generateQuotationpdf(Number(req.params.id));
+    await quotationService.generateQuotationpdf(Number(req.params.id),res);
     res.status(200).json({ message: "Quotation printed successfully" });
   });
-  getQuotationPdfData = asyncHandler(async (req: Request, res: Response) => {
+  getQuotationData = asyncHandler(async (req: Request, res: Response) => {
     const quotationPdfData = await quotationService.getQuotationPdfData(
       Number(req.params.id),
     );

@@ -1,4 +1,4 @@
-import { CreatePartDto, UpdatePartDto } from "./interface";
+import { CreatePartDto, UpdatePartDto ,FilterDto} from "./interface";
 import partRepository from "./repository";
 import { ConflictError } from "../../common/errors/ConflictError";
 import { NotFoundError } from "../../common/errors/NotFoundError";
@@ -9,8 +9,13 @@ class PartService {
     return partRepository.create(data);
   }
 
-  async getAllParts() {
-    return partRepository.findAll();
+  async getAllParts(filter:FilterDto) {
+    
+    const parts= await partRepository.findAll(filter);
+    if(parts.length===0)
+      throw new NotFoundError()
+    return parts
+
   }
 
   async getPartById(partId: number, transaction?: Transaction) {

@@ -121,16 +121,20 @@ class InvoiceService {
       quotationLines: quotationLines.map((line) => line.toJSON()),
     };
   }
-  async generateInvoicepdf(invoiceId: number) {
+  async generateInvoicepdf(invoiceId: number, res: Response) {
     const generator = new InvoicePdfGenerator();
     const pdfData = await this.getInvoicePdfData(invoiceId);
-    if (!pdfData) {
+    const {pdf,filename} = await generator.generate(pdfData);
+
+    if (!pdf) {
       throw new NotFoundError("Invoice PDf Data not found");
     }
+    res.setHeader("Content-Type", "application/pdf");
 
-    const pdf = await generator.generate(pdfData);
-    if (!pdf) throw new Error("pdf not created");
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    pdf.pipe(res)
+    pdf.end()
+
   }
-  
 }
 export default new InvoiceService();

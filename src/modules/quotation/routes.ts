@@ -21,7 +21,7 @@ router.post(
 );
 router.get("/:id/pdf",validate(quotationIdSchema,"params"),quotationController.generatePdf)
 router.delete("/delete-line/:id",quotationController.deleteLine);
-router.get("/quotation-pdf/:id",validate(quotationIdSchema,"params"),quotationController.getQuotationPdfData)
+router.get("/:id",validate(quotationIdSchema,"params"),quotationController.getQuotationData)
 // router.get("/", quotationController.getQuotations);
 // router.get('/:id',quotationController.getQuotationById)
 // router.get('/id/:customerId',customerController.getCustomerById)

@@ -1,4 +1,4 @@
-import PDFDocument from "pdfkit";
+import PDFDocument, { file } from "pdfkit";
 import fs from "fs";
 import path from "path";
 import { InvoicePdfData, QuotationPdfLine } from "./interface";
@@ -15,16 +15,24 @@ import Invoice from "../model";
 import { QuotationAttributes } from "../../quotation/interface";
 import { CustomerAttributes } from "../../customer/interface";
 import { CarAttributes } from "../../car/interface";
+type GeneratePdfResult = {
+  pdf: PDFKit.PDFDocument;
+  filename: string;
+};
+
 export class InvoicePdfGenerator extends BasePdfGenerator {
-  public generate(data: InvoicePdfData): PDFKit.PDFDocument {
+  
+  public generate(data: InvoicePdfData): GeneratePdfResult {
     const doc = new PDFDocument({
       size: "A4",
       margin: 40,
     });
 
-    const outputPath = path.join(process.cwd(), "Invoice.pdf");
+    const customerName = this.sanitizeFileName(data.customer.name);
+    const fileName = `${customerName}-${data.invoice.invoiceNumber}.pdf`;
+    const outputPath = path.join(process.cwd(), fileName);
 
-    doc.pipe(fs.createWriteStream(outputPath));
+    // doc.pipe(fs.createWriteStream(outputPath));
     this.drawHeaderBackground(doc);
 
     this.drawHeader(doc, data.invoice);
@@ -38,9 +46,12 @@ export class InvoicePdfGenerator extends BasePdfGenerator {
     tableEndY = this.drawNotes(doc, data.quotation.notes, tableEndY+20);
     this.drawSignatureSection(doc, tableEndY+20);
 
-    doc.end();
+    // doc.end();
 
-    return doc;
+    return {
+    pdf: doc,
+    filename: fileName
+};
   }
 
   private formatQuotationNumber(id: number): string {
@@ -367,4 +378,10 @@ export class InvoicePdfGenerator extends BasePdfGenerator {
       align: "center",
     });
   }
+  private sanitizeFileName(name: string): string {
+  return name
+    .replace(/[<>:"/\\|?*]/g, "")
+    .trim()
+    .replace(/\s+/g, "_");
+}
 }

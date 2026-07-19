@@ -46,9 +46,10 @@ async updateCar(id: number, data: Partial<CreateCarDto>) {
   }
 
   async getCarByCustomerId(customerId: number,transaction?:Transaction) {
-   
+      await customerService.getCustomerById(customerId)
+      
       const cars = await carRepository.findByCustomerId(customerId,transaction)
-      if (!cars) {
+      if (cars.length===0) {
         throw new NotFoundError("No Car found ");
       }
       return cars;

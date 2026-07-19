@@ -24,6 +24,8 @@ import jobOrderLineRepository from "../jobOrderLine/repository";
 import jobOrderService from "../jobOrder/service";
 import { QuotationPdfGenerator } from "./pdf/quotationPdfGenerator";
 import { QuotationPdfData } from "./pdf/interface";
+import { Response } from "express";
+
 
 class QuotationService {
   async createQuotation(data: CreateQuotationDto) {
@@ -267,12 +269,10 @@ class QuotationService {
     if (!customer) throw new NotFoundError("Customer not found");
 
     const car = await carRepository.findById(quotation.carId);
-    if (!car)
-       throw new NotFoundError("Car not found");
+    if (!car) throw new NotFoundError("Car not found");
     const quotationLines =
       await quotationLineRepository.findByQuotationId(quotationId);
-    if(!quotationLines)
-      throw new NotFoundError("Quotation Lines not found")
+    if (!quotationLines) throw new NotFoundError("Quotation Lines not found");
     return {
       quotation: quotation.toJSON(),
       customer: customer.toJSON(),
@@ -280,16 +280,19 @@ class QuotationService {
       quotationLines: quotationLines.map((line) => line.toJSON()),
     };
   }
-  async generateQuotationpdf(quotationId: number) {
+  async generateQuotationpdf(quotationId: number,res:Response) {
     const generator = new QuotationPdfGenerator();
-    const pdfData = await this.getQuotationPdfData(quotationId)
-    if(!pdfData)
-    {
-      throw new NotFoundError("Quotation PDf Data not found")
+    const pdfData = await this.getQuotationPdfData(quotationId);
+    if (!pdfData) {
+      throw new NotFoundError("Quotation PDf Data not found");
     }
-    
-    const pdf = await generator.generate(pdfData);
-    if (!pdf) throw new Error("pdf not created");
+
+    const { pdf, filename } = await generator.generate(pdfData);
+    res.setHeader("Content-Type", "application/pdf");
+
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    pdf.pipe(res);
+    pdf.end();
   }
   async approveQuotation(quotationId: number) {
     //add jobOrderData parameter to this function

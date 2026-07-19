@@ -48,10 +48,12 @@ class InvoiceController {
   });
 
 generatePdf = asyncHandler(async (req, res) => {
-    await invoiceService.generateInvoicepdf(Number(req.params.id));
+    const pdf = await invoiceService.generateInvoicepdf(Number(req.params.id),res);
        res.status(200).json({
       success: true,
       message: "Invoice printed successfully.",
+      pdf
+
     });
 });
 

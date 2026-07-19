@@ -12,17 +12,23 @@ import { Layout } from "./layout";
 import { table } from "console";
 
 import { BasePdfGenerator } from "../../../common/pdf/BasePdfGenerator";
-
+type GeneratePdfResult = {
+  pdf: PDFKit.PDFDocument;
+  filename: string;
+};
 export class QuotationPdfGenerator extends BasePdfGenerator {
-  public generate(data: QuotationPdfData): PDFKit.PDFDocument {
+  public generate(data: QuotationPdfData): GeneratePdfResult {
     const doc = new PDFDocument({
       size: "A4",
       margin: 40,
     });
 
-    const outputPath = path.join(process.cwd(), "quotation.pdf");
+    const quotationNumber = this.formatQuotationNumber(data.quotation.quotationId)
+    const customerName = this.sanitizeFileName(data.customer.name);
+    const fileName = `${customerName}-${quotationNumber}.pdf`;
+    const outputPath = path.join(process.cwd(), fileName);
 
-    doc.pipe(fs.createWriteStream(outputPath));
+    // doc.pipe(fs.createWriteStream(outputPath));
     this.drawHeaderBackground(doc);
 
     this.drawHeader(doc, data.quotation);
@@ -36,9 +42,12 @@ export class QuotationPdfGenerator extends BasePdfGenerator {
     tableEndY = this.drawNotes(doc, data.quotation.notes, tableEndY+20);
     this.drawSignatureSection(doc, tableEndY+20);
 
-    doc.end();
+    // doc.end();
 
-    return doc;
+      return {
+    pdf: doc,
+    filename: fileName
+};
   }
 
   private formatQuotationNumber(id: number): string {
@@ -365,4 +374,10 @@ export class QuotationPdfGenerator extends BasePdfGenerator {
       align: "center",
     });
   }
+    private sanitizeFileName(name: string): string {
+  return name
+    .replace(/[<>:"/\\|?*]/g, "")
+    .trim()
+    .replace(/\s+/g, "_");
+}
 }

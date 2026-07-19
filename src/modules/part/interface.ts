@@ -32,3 +32,6 @@ export interface UpdatePartDto {
     quantity?: number;
     minimumQuantity?: number;
 }
+export interface FilterDto {
+    search?: string;
+}
