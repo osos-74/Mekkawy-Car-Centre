@@ -1,7 +1,8 @@
-import { CreateCustomerDto } from "./interface";
+import { CreateCustomerDto,CustomerFilterDto } from "./interface";
 import customerRepository from "./repository";
 import { ConflictError } from "../../common/errors/ConflictError";
 import { NotFoundError } from "../../common/errors/NotFoundError";
+
 class CustomerService {
   async createCustomer(data: CreateCustomerDto) {
     const existing = await customerRepository.findByPhone(data.phoneNumber);
@@ -21,12 +22,18 @@ class CustomerService {
     return customer;
   }
 
-  async getAllCustomers() {
-    return customerRepository.findAll();
-  }
+ async geAllCustomers(filters: CustomerFilterDto) {
+    return customerRepository.getAllCustomers(filters);
+}
 
   async getCustomerByPhone(phoneNumber: string) {
-    return customerRepository.findByPhone(phoneNumber);
+
+    const customer =await customerRepository.findByPhone(phoneNumber);
+
+    if(!customer)
+      throw new NotFoundError("Customer not found")
+
+    return customer
   }
 
   async updateCustomer(id: number, data: Partial<CreateCustomerDto>) {

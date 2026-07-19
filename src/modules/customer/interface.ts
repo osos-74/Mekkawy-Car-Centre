@@ -16,3 +16,8 @@ export interface UpdateCustomerDto {
     phoneNumber?: string;
     address?: string;
 }
+export interface CustomerFilterDto {
+  name?: string;
+  phone?: string;
+  address?: string;
+}

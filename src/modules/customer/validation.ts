@@ -20,5 +20,13 @@ export const createCustomerSchema = z.object({
         .min(3, "Address must be at least 3 characters")
         .max(255, "Address cannot exceed 255 characters"),
 });
+export const CustomerIdSchema = z.object({
+    id: z.coerce.number().int().positive(),
+});
 
+export const CustomerFilterDtoSchema = z.object({
+  name: z.string().trim().optional(),
+  phone: z.string().trim().optional(),
+  address: z.string().trim().optional(),
+});
 export const updateCustomerSchema = createCustomerSchema.partial();

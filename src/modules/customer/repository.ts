@@ -1,7 +1,10 @@
 import Customer from "./model";
+import { Op } from "sequelize";
 import {
     CreateCustomerDto,
-    UpdateCustomerDto
+    UpdateCustomerDto,
+    CustomerFilterDto
+
 } from "./interface";
 
 class CustomerRepository {
@@ -22,9 +25,27 @@ class CustomerRepository {
         });
     }
 
-    async findAll() {
-        return Customer.findAll();
+   async getAllCustomers(filters: CustomerFilterDto) {
+    const where: any = {};
+
+    if (filters.name) {
+        where.name = {
+            [Op.like]: `%${filters.name}%`,
+        };
     }
+
+    if (filters.phone) {
+        where.phoneNumber = filters.phone;
+    }
+
+    if (filters.address) {
+        where.address = {
+            [Op.like]: `%${filters.address}%`,
+        };
+    }
+
+    return Customer.findAll({ where });
+}
 
     async update(
         customerId: number,
