@@ -36,10 +36,14 @@ app.use("/api/quotation-lines", quotationLineRoutes);
 app.use("/api/invoices", invoiceRoutes);
 app.use(errorHandler)
 
+const PORT = Number(process.env.PORT) || 3000;
 
-  app.listen(process.env.PORT, () => {
-    console.log(`Server running on port ${process.env.PORT}`);
-  });
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+  // app.listen(process.env.PORT, () => {
+  //   console.log(`Server running on port ${process.env.PORT}`);
+  // });
 }
 
 startServer();
