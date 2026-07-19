@@ -6,6 +6,7 @@ import {
 } from "./interface";
 import { Transaction } from "sequelize";
 import { Op } from "sequelize";
+import Customer from "../customer/model";
 class CarRepository {
 
     async create(data: CreateCarDto, transaction?: Transaction) {
@@ -74,7 +75,10 @@ class CarRepository {
           }
         : undefined;
 
-    return Car.findAll({ where });
+   return Car.findAll({
+        where,
+        include: [{ model: Customer, as: "customer", attributes: ["name", "phoneNumber"] }],
+    });
 }
 
     async update(

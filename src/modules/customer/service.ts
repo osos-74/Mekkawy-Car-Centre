@@ -28,7 +28,7 @@ class CustomerService {
       {
         throw new NotFoundError()
       }
-
+      return customers
 }
 
   async getCustomerByPhone(phoneNumber: string) {
