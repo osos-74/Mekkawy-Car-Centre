@@ -10,7 +10,7 @@ export async function initializeDatabase() {
   try {
     await sequelize.authenticate();
 
-    await sequelize.sync();
+    await sequelize.sync({alter:true});
 
     console.log("✅ Database initialized");
   } catch (error) {
