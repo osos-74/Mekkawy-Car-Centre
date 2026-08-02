@@ -41,6 +41,11 @@ export const createCarSchema = z.object({
     .trim()
     .min(3, "Body number is required")
     .max(100, "Body number cannot exceed 100 characters"),
+    mileage: z
+    .number()
+    .int()
+    .min(0, "Mileage must be a non-negative integer")
+   
 });
 export const IdSchema = z.object({
   id: z.coerce.number().int().positive(),

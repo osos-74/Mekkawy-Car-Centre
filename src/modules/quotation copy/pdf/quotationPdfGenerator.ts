@@ -8,12 +8,10 @@ import Customer from "../../customer/model";
 
 import { CompanyInfo } from "../../../common/pdf/CompanyInfo";
 import { Colors } from "../../../common/pdf/Colors";
-import { Layout } from "./layout";
+import { Layout } from "../../../common/pdf/Layout";
 import { table } from "console";
 
 import { BasePdfGenerator } from "../../../common/pdf/BasePdfGenerator";
-import companyService from "../../../common/company/service";
-
 
 export class QuotationPdfGenerator extends BasePdfGenerator {
   public generate(data: QuotationPdfData): PDFKit.PDFDocument {

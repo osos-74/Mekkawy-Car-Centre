@@ -31,6 +31,8 @@ class Car extends Model<
 
     declare bodyNumber: string;
 
+    declare mileage: number;
+
 }
 
 Car.init(
@@ -88,6 +90,11 @@ Car.init(
             allowNull: false,
             unique: true,
             field: "body_number",
+        },
+           mileage: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            field: "mileage",
         },
     },
     {

@@ -10,8 +10,11 @@ import partRoutes from "./modules/part/routes";
 import serviceRoutes from "./modules/service/routes";
 import quotationRoutes from "./modules/quotation/routes";
 import quotationLineRoutes from "./modules/quotationLine/routes";
+import employeeRoutes from "./modules/employee/routes";
 import invoiceRoutes from "./modules/invoice/routes";
 import { errorHandler } from "./common/middleware/errorHandler";
+import companyRoutes from "./common/company/routes";
+
 
 
 
@@ -34,6 +37,10 @@ app.use("/api/services", serviceRoutes);
 app.use("/api/quotations", quotationRoutes);
 app.use("/api/quotation-lines", quotationLineRoutes);
 app.use("/api/invoices", invoiceRoutes);
+app.use("/api/employees", employeeRoutes);
+app.use("/api/company", companyRoutes);
+
+
 app.use(errorHandler)
 
 

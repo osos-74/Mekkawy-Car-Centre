@@ -17,3 +17,11 @@ export interface QuotationPdfLine {
     discount: number;
     lineTotal: number;
 }
+export interface CompanyInfo {
+    name: string;
+    slogan: string;
+    address: string;
+    phone: string;
+    email: string;
+    website: string;
+}
