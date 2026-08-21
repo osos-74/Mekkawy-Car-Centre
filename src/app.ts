@@ -14,6 +14,7 @@ import employeeRoutes from "./modules/employee/routes";
 import invoiceRoutes from "./modules/invoice/routes";
 import { errorHandler } from "./common/middleware/errorHandler";
 import companyRoutes from "./common/company/routes";
+import inspectionRoutes from "./modules/inspection/routes";
 
 
 
@@ -39,6 +40,8 @@ app.use("/api/quotation-lines", quotationLineRoutes);
 app.use("/api/invoices", invoiceRoutes);
 app.use("/api/employees", employeeRoutes);
 app.use("/api/company", companyRoutes);
+app.use("/api/inspections", inspectionRoutes);
+
 
 
 app.use(errorHandler)
