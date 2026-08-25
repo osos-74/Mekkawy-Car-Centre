@@ -67,7 +67,7 @@ export function verifyRefreshToken(token: string): RefreshTokenPayload {
         const payload = jwt.verify(
             token,
             getJwtRefreshSecret()
-        ) as unknown as RefreshTokenPayload;
+        ) as RefreshTokenPayload;
 
         if (payload.type !== "refresh") {
             throw new UnauthorizedError("Invalid token");
