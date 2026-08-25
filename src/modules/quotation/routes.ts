@@ -1,32 +1,89 @@
-const express = require('express');
-const cors = require("cors");
-const router = express.Router();
-import validate from "../../common/middleware/validate"
-import {createQuotationSchema,updateQuotationSchema,filterQuotationSchema,quotationIdSchema} from "./validation";
+import { Router } from "express";
 
-import quotationController from"./controller"
+import validate from "../../common/middleware/validate";
+import authenticate from "../../common/middleware/authenticate";
+import authorize from "../../common/middleware/authorize";
+import { UserRole } from "../user/model";
+
+import {
+    createQuotationSchema,
+    updateQuotationSchema,
+    filterQuotationSchema,
+    quotationIdSchema
+} from "./validation";
+
+import quotationController from "./controller";
 import { createQuotationLineSchema } from "../quotationLine/validation";
 
+const router = Router();
 
-router.post("/", validate(createQuotationSchema),quotationController.create);
-router.get("/", validate(filterQuotationSchema,"query"), quotationController.getQuotations);
-router.put("/:id", validate(updateQuotationSchema),quotationController.update);
-router.put("/:id/approve",validate(quotationIdSchema,"params"),quotationController.approveQuotation)
+const writeRoles = [UserRole.ADMIN, UserRole.SERVICE_ADVISOR] as const;
+const pdfRoles = [
+    UserRole.ADMIN,
+    UserRole.SERVICE_ADVISOR,
+    UserRole.CASHIER
+] as const;
 
-router.delete("/:id",quotationController.deleteQuotation);
+router.use(authenticate);
+
+router.post(
+    "/",
+    authorize(...writeRoles),
+    validate(createQuotationSchema),
+    quotationController.create
+);
+
+router.get(
+    "/",
+    validate(filterQuotationSchema, "query"),
+    quotationController.getQuotations
+);
+
+router.put(
+    "/:id",
+    authorize(...writeRoles),
+    validate(updateQuotationSchema),
+    quotationController.update
+);
+
+router.put(
+    "/:id/approve",
+    authorize(...writeRoles),
+    validate(quotationIdSchema, "params"),
+    quotationController.approveQuotation
+);
+
+router.delete(
+    "/:id",
+    authorize(...writeRoles),
+    quotationController.deleteQuotation
+);
+
 router.post(
     "/add-line",
+    authorize(...writeRoles),
     validate(createQuotationLineSchema),
     quotationController.addLine
 );
-router.get("/:id/pdf",validate(quotationIdSchema,"params"),quotationController.generatePdf)
-router.delete("/delete-line/:id",quotationController.deleteLine);
-router.get("/quotation-pdf/:id",validate(quotationIdSchema,"params"),quotationController.getQuotationPdfData)
-// router.get("/", quotationController.getQuotations);
-// router.get('/:id',quotationController.getQuotationById)
-// router.get('/id/:customerId',customerController.getCustomerById)
 
+router.get(
+    "/:id/pdf",
+    authorize(...pdfRoles),
+    validate(quotationIdSchema, "params"),
+    quotationController.generatePdf
+);
 
-// router.post("/", customerController.addCustomer);
+router.delete(
+    "/delete-line/:id",
+    authorize(...writeRoles),
+    quotationController.deleteLine
+);
+
+router.get(
+    "/quotation-pdf/:id",
+    authorize(...pdfRoles),
+    validate(quotationIdSchema, "params"),
+    quotationController.getQuotationPdfData
+);
 
 export default router;

@@ -1,49 +1,44 @@
-const express = require('express');
-const cors = require("cors");
-const router = express.Router();
-import validate from "../../common/middleware/validate"
-import {createCarSchema, filterCarSchema,IdSchema} from "./validation";
+import { Router } from "express";
 
-import carController from"./controller"
-router.get("/", validate(filterCarSchema,"query"), carController.getCars);
+import validate from "../../common/middleware/validate";
+import authenticate from "../../common/middleware/authenticate";
+import authorize from "../../common/middleware/authorize";
+import { UserRole } from "../user/model";
 
-router.post("/", validate(createCarSchema,"body"),carController.create);
-router.put("/:id", validate(createCarSchema,"body"),carController.update);
-router.delete("/:id",carController.delete);
-// router.get('/:phone',carController.getCarByPhone)
-router.get('/customer/:id',validate(IdSchema,"params"),carController.getCarByCustomerId)
+import { createCarSchema, filterCarSchema, IdSchema } from "./validation";
 
+import carController from "./controller";
 
-// router.post("/", customerController.addCustomer);
+const router = Router();
+
+router.use(authenticate);
+
+router.get("/", validate(filterCarSchema, "query"), carController.getCars);
+
+router.post(
+    "/",
+    authorize(UserRole.ADMIN, UserRole.SERVICE_ADVISOR),
+    validate(createCarSchema, "body"),
+    carController.create
+);
+
+router.put(
+    "/:id",
+    authorize(UserRole.ADMIN, UserRole.SERVICE_ADVISOR),
+    validate(createCarSchema, "body"),
+    carController.update
+);
+
+router.delete(
+    "/:id",
+    authorize(UserRole.ADMIN, UserRole.SERVICE_ADVISOR),
+    carController.delete
+);
+
+router.get(
+    "/customer/:id",
+    validate(IdSchema, "params"),
+    carController.getCarByCustomerId
+);
 
 export default router;
-
-
-// POST   /quotations
-
-// GET    /quotations
-
-// GET    /quotations/:quotationId
-
-// PUT    /quotations/:quotationId
-
-// DELETE /quotations/:quotationId
-
-// POST   /quotations/:quotationId/approve
-
-// POST   /quotations/:quotationId/reject
-
-// GET    /quotations/:quotationId/pdf
-
-// POST   /quotations/:quotationId/duplicate
-
-
-// POST   /quotations/:quotationId/services
-
-// POST   /quotations/:quotationId/parts
-
-// GET    /quotations/:quotationId/lines
-
-// PUT    /quotation-lines/:quotationLineId
-
-// DELETE /quotation-lines/:quotationLineId

@@ -1,7 +1,9 @@
 import { Router } from "express";
 
 import validate from "../../common/middleware/validate";
-import { asyncHandler } from "../../common/middleware/asyncHandler";
+import authenticate from "../../common/middleware/authenticate";
+import authorize from "../../common/middleware/authorize";
+import { UserRole } from "../user/model";
 
 import employeeController from "./controller";
 
@@ -13,6 +15,9 @@ import {
 } from "./validation";
 
 const router = Router();
+
+router.use(authenticate);
+router.use(authorize(UserRole.ADMIN));
 
 router.post("/", validate(createEmployeeSchema), employeeController.createEmployee);
 
@@ -32,4 +37,5 @@ router.delete(
     validate(employeeIdSchema, "params"),
     employeeController.deleteEmployee
 );
-export default router
+
+export default router;

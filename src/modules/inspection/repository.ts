@@ -15,14 +15,22 @@ class InspecitonRepository {
     return Inspection.findByPk(InspectionId, { transaction });
   }
 
-  // async findByCustomerId(customerId: number, transaction?: Transaction) {
-  //   return Inspection.findAll({
-  //     where: {
-  //       customerId,
-  //     },
-  //     transaction,
-  //   });
-  // }
+  async findByCustomerId(customerId: number, transaction?: Transaction) {
+    return Inspection.findAll({
+      include: [
+        {
+          model: Car,
+          as: "car",
+          where: {
+            customerId,
+          },
+          required: true,
+        },
+      ],
+      transaction,
+    });
+  }
+
   async findByCarId(carId: number, transaction?: Transaction) {
     return Inspection.findAll({
       where: {

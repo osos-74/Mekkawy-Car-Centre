@@ -1,8 +1,10 @@
 import express from "express";
 import dotenv from "dotenv";
-import { initDatabase } from "./database/initDatabase";
 
 import cors from "cors";
+
+import { validateEnv } from "./config/env";
+import { initDatabase } from "./database/initDatabase";
 
 import customerRoutes from "./modules/customer/routes";
 import carRoutes from "./modules/car/routes";
@@ -15,41 +17,37 @@ import invoiceRoutes from "./modules/invoice/routes";
 import { errorHandler } from "./common/middleware/errorHandler";
 import companyRoutes from "./common/company/routes";
 import inspectionRoutes from "./modules/inspection/routes";
-
-
-
-
-
+import userRoutes from "./modules/user/routes";
+import authRoutes from "./modules/authentication/routes";
 
 dotenv.config();
+validateEnv();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 async function startServer() {
-  await initDatabase();
+    await initDatabase();
 
+    app.use("/api/auth", authRoutes);
+    app.use("/api/customers", customerRoutes);
+    app.use("/api/cars", carRoutes);
+    app.use("/api/parts", partRoutes);
+    app.use("/api/services", serviceRoutes);
+    app.use("/api/quotations", quotationRoutes);
+    app.use("/api/quotation-lines", quotationLineRoutes);
+    app.use("/api/invoices", invoiceRoutes);
+    app.use("/api/employees", employeeRoutes);
+    app.use("/api/company", companyRoutes);
+    app.use("/api/inspections", inspectionRoutes);
+    app.use("/api/users", userRoutes);
 
-app.use("/api/customers", customerRoutes);
-app.use("/api/cars", carRoutes);
-app.use("/api/parts", partRoutes);
-app.use("/api/services", serviceRoutes);
-app.use("/api/quotations", quotationRoutes);
-app.use("/api/quotation-lines", quotationLineRoutes);
-app.use("/api/invoices", invoiceRoutes);
-app.use("/api/employees", employeeRoutes);
-app.use("/api/company", companyRoutes);
-app.use("/api/inspections", inspectionRoutes);
+    app.use(errorHandler);
 
-
-
-app.use(errorHandler)
-
-
-  app.listen(process.env.PORT, () => {
-    console.log(`Server running on port ${process.env.PORT}`);
-  });
+    app.listen(process.env.PORT, () => {
+        console.log(`Server running on port ${process.env.PORT}`);
+    });
 }
 
 startServer();

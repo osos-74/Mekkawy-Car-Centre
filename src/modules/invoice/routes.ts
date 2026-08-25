@@ -1,34 +1,57 @@
 import { Router } from "express";
+
 import validate from "../../common/middleware/validate";
+import authenticate from "../../common/middleware/authenticate";
+import authorize from "../../common/middleware/authorize";
+import { UserRole } from "../user/model";
 import { createInvoiceSchema, invoiceIdSchema } from "./validation";
 import invoiceController from "./controller";
 
 const router = Router();
 
+const invoiceRoles = [UserRole.ADMIN, UserRole.CASHIER] as const;
+
+router.use(authenticate);
+
 router.post(
-  "/",
-  validate(createInvoiceSchema),
-  invoiceController.createInvoice,
+    "/",
+    authorize(...invoiceRoles),
+    validate(createInvoiceSchema),
+    invoiceController.createInvoice,
 );
 
-router.get("/", invoiceController.getInvoices);
-
-router.get("/:id", invoiceController.getInvoiceById);
-
-router.patch("/:id", invoiceController.updateInvoice);
-
-router.delete("/:id", invoiceController.deleteInvoice);
+router.get("/", authorize(...invoiceRoles), invoiceController.getInvoices);
 
 router.get(
-  "/:id/pdf",
-  validate(invoiceIdSchema, "params"),
-  invoiceController.generatePdf,
+    "/:id",
+    authorize(...invoiceRoles),
+    invoiceController.getInvoiceById
+);
+
+router.patch(
+    "/:id",
+    authorize(...invoiceRoles),
+    invoiceController.updateInvoice
+);
+
+router.delete(
+    "/:id",
+    authorize(...invoiceRoles),
+    invoiceController.deleteInvoice
 );
 
 router.get(
-  "/invoice-pdf/:id",
-  validate(invoiceIdSchema, "params"),
-  invoiceController.getInvoicePdfData,
+    "/:id/pdf",
+    authorize(...invoiceRoles),
+    validate(invoiceIdSchema, "params"),
+    invoiceController.generatePdf,
+);
+
+router.get(
+    "/invoice-pdf/:id",
+    authorize(...invoiceRoles),
+    validate(invoiceIdSchema, "params"),
+    invoiceController.getInvoicePdfData,
 );
 
 export default router;
